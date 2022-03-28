@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        replay.setOnClickListener(v -> newGame());
         level.setOnClickListener(v -> nextlevel());
         sound.setOnClickListener(v -> setSoundOn());
         registerReceiver(receiver,new IntentFilter(BROADCAST));
@@ -127,20 +128,12 @@ public class MainActivity extends AppCompatActivity {
      * Changer la difficulté de jeu
      * */
     private void nextlevel(){
-        if(!gameBegin || gameEnd){
-            gameEnd = false;
-            gameBegin = false;
+        if(isNewGame()){
             nLevel = nLevel %3 +1;
             // Affichage du niveau
             level.setText("LEVEL "+ nLevel);
-            // Changer le nombre de bombe
-            nBomb = 10+ ((nLevel-1) *15);
-            setNumber(bomb_number,nBomb);
-            // Changer le timer
-            nTimer = 0;
-            setNumber(timer,nTimer);
-            // Changer la taille de grille
-            gridSide(4+4* nLevel); // 8 12 16
+            // Nouvelle grille
+            newGame();
         }
     }
 
@@ -168,25 +161,31 @@ public class MainActivity extends AppCompatActivity {
      * @param largeur Largeur de la grille à créer
      * */
     private void gridSide(int largeur){
+        Toast t = Toast.makeText(this, "Chargement d'une nouvelle grille", Toast.LENGTH_LONG);
+        t.show();
         // Suppression des lignes existantes dans la vue
         tlGrid.removeAllViews();
         // Création d'une nouvelle grille
-        grille = new Grid(largeur,nBomb);
+        grille = new Grid(largeur, nBomb);
         int idtr = 8190; // id défini (car par défaut tous à -1)
-        for(int x = 0; x < largeur; x++){
+        for (int x = 0; x < largeur; x++) {
             // Ajouter une ligne dans la vue
             TableRow tr = new TableRow(this);
             // identifiant différent pour chaque ligne
-            idtr++; tr.setId(idtr);
-            tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,TableRow.LayoutParams.WRAP_CONTENT));
+            idtr++;
+            tr.setId(idtr);
+            tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
             tlGrid.addView(tr);
-            for(int y = 0; y < largeur; y++) {
+            for (int y = 0; y < largeur; y++) {
                 // Ajouter une cellule de la grille(mémoire) dans la ligne de la table(vue)
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.add(tr.getId(),grille.getCell(x,y));
+                ft.add(tr.getId(), grille.getCell(x, y));
                 ft.commit();
             }
         }
+        // Attendre la fin de toutes les transactions
+        getSupportFragmentManager().executePendingTransactions();
+        t.cancel();
     }
 
     /**
@@ -210,6 +209,30 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this,"Victoire !",Toast.LENGTH_SHORT).show();
         } else {
             // Défaite
+        }
+    }
+
+    private void newGame(){
+        if(isNewGame()) {
+            // Changer le nombre de bombe
+            nBomb = 10 + ((nLevel - 1) * 15);
+            setNumber(bomb_number, nBomb);
+            // Changer le timer
+            nTimer = 0;
+            setNumber(timer, nTimer);
+            // Changer la taille de grille
+            gridSide(4 + 4 * nLevel); // 8 12 16
+        }
+    }
+
+    private boolean isNewGame(){
+        if(!gameBegin || gameEnd) {
+            gameEnd = false;
+            gameBegin = false;
+            return true;
+        } else {
+            Toast.makeText(this,"Veuillez terminer la partie",Toast.LENGTH_SHORT).show();
+            return false;
         }
     }
 
