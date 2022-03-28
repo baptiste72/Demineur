@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,9 +27,10 @@ public class MainActivity extends AppCompatActivity {
 
     // Variables
     private boolean gameBegin = false;
+    private boolean gameEnd = false;
     private boolean soundOn = true;
     private int nLevel = 0; // 1 2 3
-    private int nBomb = 20; // 20 30 40
+    private int nBomb = 0; // 10 25 40
     private  int nTimer = 0;
     private Grid grille;
     public static final String BROADCAST = "com.cfc.slides.event";
@@ -49,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
         tlGrid = findViewById(R.id.grid);
 
         // Affichage
-        setNumber(bomb_number,nBomb);
         setSoundOn(true);
         nextlevel();
     }
@@ -71,18 +72,45 @@ public class MainActivity extends AppCompatActivity {
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            switch (intent.getStringExtra("method")){
-                case "OpenNear":
-                    grille.openNear(
-                            intent.getIntExtra("OpenNearX",0),
-                            intent.getIntExtra("OpenNearY",0));
-                    break;
-                case "addNBomb":
-                    addNBomb(intent.getIntExtra("addNBomb",0));
-                default:
-                    break;
+            // Ne pouvoir faire des actions
+            // que lorsque la game n'est pas terminée
+            if(!gameEnd) {
+                int posX = intent.getIntExtra("posX", 0);
+                int posY = intent.getIntExtra("posY", 0);
+                Cell c = grille.getCell(posX, posY);
+                switch (intent.getStringExtra("method")) {
+                    case "open":
+                        grille.openCell(posX, posY);
+                        if (c.getBomb()) {
+                            // Afficher toutes les bombes
+                            grille.openBomb();
+                            // Fond rouge pour la case qui a perdu
+                            c.setLooseCase();
+                            //  Dire que la game est perdu
+                            gameWin(false);
+                        } else {
+                            gameBegin = true;
+                            // S'il n'y a pas de bombes adjacentes
+                            if(c.getNearBomb() == 0){
+                                // Ouvre les cases adjacentes
+                                grille.openNear(posX, posY);
+                            }
+                            // Vérification de la victoire
+                            checkWin();
+                        }
+                        break;
+                    case "nextState":
+                        c.nextState();
+                        break;
+                    case "addNBomb":
+                        int addNBomb = intent.getIntExtra("addNBomb", 0);
+                        addNBomb(addNBomb);
+                        // Vérification de la victoire
+                        checkWin();
+                    default:
+                        break;
+                }
             }
-
         }
     };
 
@@ -99,13 +127,18 @@ public class MainActivity extends AppCompatActivity {
      * Changer la difficulté de jeu
      * */
     private void nextlevel(){
-        if(!gameBegin){
+        if(!gameBegin || gameEnd){
+            gameEnd = false;
+            gameBegin = false;
             nLevel = nLevel %3 +1;
             // Affichage du niveau
             level.setText("LEVEL "+ nLevel);
             // Changer le nombre de bombe
-            nBomb = 10+ nLevel *10;
+            nBomb = 10+ ((nLevel-1) *15);
             setNumber(bomb_number,nBomb);
+            // Changer le timer
+            nTimer = 0;
+            setNumber(timer,nTimer);
             // Changer la taille de grille
             gridSide(4+4* nLevel); // 8 12 16
         }
@@ -117,8 +150,12 @@ public class MainActivity extends AppCompatActivity {
      * @param x nombre à afficher
      * */
     private void setNumber(TextView tv, int x){
-        String txt = ""+x;
-        if(x < 10){
+        String txt = ""+Math.abs(x);
+        if(x <= -10){
+            txt = "-"+txt;
+        } else if (x < 0){
+            txt = "-0"+txt;
+        } else if(x < 10){
             txt = "00"+txt;
         } else if(x < 100){
             txt = "0"+txt;
@@ -149,6 +186,30 @@ public class MainActivity extends AppCompatActivity {
                 ft.add(tr.getId(),grille.getCell(x,y));
                 ft.commit();
             }
+        }
+    }
+
+    /**
+     * Vérification de la victoire
+     * */
+    private void checkWin(){
+        if(grille.checkWin(nBomb)){
+            gameWin(true);
+        }
+    }
+
+    /**
+     * Traitement de la fin du jeu
+     * @param win Est-ce que le joueur à gagné ?
+     * */
+    private void gameWin(boolean win){
+        // Fin de la game
+        gameEnd = true;
+        if(win){
+            // Ajouter la victoire
+            Toast.makeText(this,"Victoire !",Toast.LENGTH_SHORT).show();
+        } else {
+            // Défaite
         }
     }
 

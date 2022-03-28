@@ -81,6 +81,15 @@ public class Grid {
     }
 
     /**
+     * Demmander à une cellule de s'ouvrir
+     * @param x position de la ligne de la case
+     * @param y position de la colonne de la case
+     * */
+    public void openCell(int x, int y){
+        getCell(x,y).open();
+    }
+
+    /**
      * Découvrir les cellules adjcentes
      * @param x position de la ligne de la case
      * @param y position de la colonne de la case
@@ -90,13 +99,50 @@ public class Grid {
             for(int j=y-1; j<=y+1; j++){
                 // Cibler que des cases dans la grille
                 if(i>=0 && i<nLargeur && j>=0 && j<nLargeur) {
-                    Cell c = getCell(i, j);
-                    // si pas découvert et pas une bombe
-                    if(!c.getBomb()){
-                        getCell(i, j).open();
-                    }
+                    openCell(i,j);
                 }
             }
         }
+    }
+
+    /**
+     * Ouvrir uniquement les cases où il y a des bombes
+     * */
+    public void openBomb(){
+        Cell c;
+        for(int x = 0; x < nLargeur; x++){
+            for(int y = 0; y < nLargeur; y++){
+                c = getCell(x,y);
+                if(c.getBomb()){
+                    c.discover(true);
+                }
+            }
+        }
+    }
+
+    /**
+     * Victoire si :
+     *  - nBomb est à 0
+     *  - toutes les bombes sont FLAG
+     *  - toutes les Cell sans bombe DISCOVER
+     * @param nBomb Nombre de bombes restantes
+     * */
+    public boolean checkWin(int nBomb){
+        // Bombe à 0
+        if(nBomb != 0){ return false; }
+        Cell c;
+        for(int x = 0; x < nLargeur; x++){
+            for(int y = 0; y < nLargeur; y++){
+                c = getCell(x,y);
+                if(c.getBomb() && c.getState() != Cell.State.FLAG) {
+                    // Toutes les bombes FLAG
+                    return false;
+                } else if(!c.getBomb() && c.getState() != Cell.State.DISCOVER){
+                    // Toutes les cell sans bombe DISCOVER
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

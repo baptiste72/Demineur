@@ -1,6 +1,8 @@
 package com.example.demineur;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.ColorInt;
@@ -25,7 +27,7 @@ public class Cell extends Fragment {
 
     private String posX, posY;
 
-    private ImageView cell_img;
+    private ImageView cell_bg, cell_img;
     private TextView cell_txt;
 
     protected enum State{
@@ -65,12 +67,14 @@ public class Cell extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_cell, container, false);
+        cell_bg = v.findViewById(R.id.cell_bg);
         cell_img = v.findViewById(R.id.cell_img);
-        // Simple = ouvre la grille
-        cell_img.setOnClickListener(v1->open());
-        // Long   = Change l'état de la case
-        cell_img.setOnLongClickListener(v12 -> nextState());
         cell_txt = v.findViewById(R.id.cell_txt);
+        // Simple = ouvre la grille
+        cell_img.setOnClickListener(v1->sendOpen());
+        // Long   = Change l'état de la case
+        cell_img.setOnLongClickListener(v12 -> sendNextState());
+        setPicture();
         return v;
     }
 
@@ -99,6 +103,10 @@ public class Cell extends Fragment {
         this.bomb = bomb;
     }
 
+    public int getNearBomb() {
+        return this.nearBomb;
+    }
+
     /**
      * Incrémenter le nombre de bombes adjacentes à la case
      * */
@@ -110,7 +118,7 @@ public class Cell extends Fragment {
      * Passer à l'état suivant de la case
      * Pas découvert > Drapeau > Questionnement
      * */
-    private boolean nextState(){
+    public void nextState(){
         switch (this.state){
             // Pas découvert -> Flag
             case UNDISCOVER:
@@ -129,7 +137,6 @@ public class Cell extends Fragment {
             default:
                 break;
         }
-        return true;
     }
 
     /**
@@ -137,21 +144,58 @@ public class Cell extends Fragment {
      * Si besoin envoyer un message à l'activité principale pour découvrir les cases adjacentes
      * */
     public void open(){
-        if(this.state == State.UNDISCOVER){
-            setState(State.DISCOVER);
-            if(!this.bomb && this.nearBomb == 0) {
+        if(!this.bomb && discover(false)){
+            if(this.nearBomb == 0) {
                 // si pas une Bombe et qu'il n'y a pas de bombe proche
                 // alors ouvre les cases adjacentes
-                Handler handler = new Handler();
-                handler.post(() -> {
-                    Intent i = new Intent(MainActivity.BROADCAST);
-                    i.putExtra("method","OpenNear");
-                    i.putExtra("OpenNearX",getPosX());
-                    i.putExtra("OpenNearY",getPosY());
-                    getActivity().sendBroadcast(i);
-                });
+                sendOpen();
             }
         }
+    }
+
+    /**
+     * Découvrir une case
+     * */
+    public boolean discover(boolean gameEnd){
+        if(this.state == State.UNDISCOVER) {
+            setState(State.DISCOVER);
+            return true;
+        } else if(gameEnd){
+            if(this.state == State.QUEST){
+                setState(State.DISCOVER);
+            } else if(this.state == State.FLAG){
+                cell_bg.setImageResource(R.drawable.case1);
+                cell_img.setImageResource(R.drawable.bombflaged);
+            }
+        }
+        return false;
+    }
+
+    private void sendOpen(){
+        // Demander l'ouverture que si la case
+        // n'est pas FLAG ou QUEST
+        if(getState() != State.FLAG && getState() != State.QUEST){
+            Handler handler = new Handler();
+            handler.post(() -> {
+                Intent i = new Intent(MainActivity.BROADCAST);
+                i.putExtra("method", "open");
+                i.putExtra("posX", getPosX());
+                i.putExtra("posY", getPosY());
+                getActivity().sendBroadcast(i);
+            });
+        }
+    }
+
+    private boolean sendNextState(){
+        Handler handler = new Handler();
+        handler.post(() -> {
+            Intent i = new Intent(MainActivity.BROADCAST);
+            i.putExtra("method","nextState");
+            i.putExtra("posX",getPosX());
+            i.putExtra("posY",getPosY());
+            getActivity().sendBroadcast(i);
+        });
+        return true;
     }
 
     /**
@@ -160,24 +204,53 @@ public class Cell extends Fragment {
     public void setPicture(){
         switch (this.state){
             case UNDISCOVER:
-                cell_txt.setText("_");
+                cell_bg.setImageResource(R.drawable.case0);
+                cell_img.setImageResource(R.drawable.vide);
+                cell_txt.setText("");
                 break;
             case DISCOVER:
+                cell_bg.setImageResource(R.drawable.case1);
+                cell_img.setImageResource(R.drawable.vide);
                 if(this.bomb){
-                    cell_txt.setText("X");
-                } else if (this.nearBomb == 0){
-                    cell_txt.setText(" ");
-                } else {
+                    cell_img.setImageResource(R.drawable.bomb);
+                } else if (this.nearBomb > 0){
                     cell_txt.setText(""+nearBomb);
+                    if(this.nearBomb == 1){
+                        cell_txt.setTextColor(getResources().getColor(R.color.blue));
+                    } else if(this.nearBomb == 2){
+                        cell_txt.setTextColor(getResources().getColor(R.color.darkgreen));
+                    } else if(this.nearBomb == 3){
+                        cell_txt.setTextColor(getResources().getColor(R.color.red));
+                    } else if(this.nearBomb == 4){
+                        cell_txt.setTextColor(getResources().getColor(R.color.darkblue));
+                    } else if(this.nearBomb == 5){
+                        cell_txt.setTextColor(getResources().getColor(R.color.green));
+                    } else if(this.nearBomb == 6){
+                        cell_txt.setTextColor(getResources().getColor(R.color.darkred));
+                    } else {
+                        cell_txt.setTextColor(getResources().getColor(R.color.black));
+                    }
                 }
                 break;
             case FLAG:
-                cell_txt.setText("F");
+                cell_bg.setImageResource(R.drawable.case0);
+                cell_img.setImageResource(R.drawable.drapeau);
                 break;
             case QUEST:
+                cell_bg.setImageResource(R.drawable.case0);
+                cell_img.setImageResource(R.drawable.vide);
                 cell_txt.setText("?");
+                cell_txt.setTextColor(getResources().getColor(R.color.black));
                 break;
         }
+    }
+
+    /**
+     * Mettre en évidence la case qui à perdu
+     * */
+    public void setLooseCase(){
+        cell_bg.setImageResource(R.drawable.caser);
+        cell_img.setImageResource(R.drawable.bomb);
     }
 
     /**
