@@ -122,24 +122,26 @@ public class Grid {
 
     /**
      * Victoire si :
-     *  - nBomb est à 0
-     *  - toutes les bombes sont FLAG
      *  - toutes les Cell sans bombe DISCOVER
      * @param nBomb Nombre de bombes restantes
      * */
     public boolean checkWin(int nBomb){
-        // Bombe à 0
-        if(nBomb != 0){ return false; }
         Cell c;
         for(int x = 0; x < nLargeur; x++){
             for(int y = 0; y < nLargeur; y++){
                 c = getCell(x,y);
-                if(c.getBomb() && c.getState() != Cell.State.FLAG) {
-                    // Toutes les bombes FLAG
-                    return false;
-                } else if(!c.getBomb() && c.getState() != Cell.State.DISCOVER){
+                if(!c.getBomb() && c.getState() != Cell.State.DISCOVER){
                     // Toutes les cell sans bombe DISCOVER
                     return false;
+                }
+            }
+        }
+        // Si victoire affiche des drapeaux sur toutes les bombes
+        for(int x = 0; x < nLargeur; x++){
+            for(int y = 0; y < nLargeur; y++){
+                c = getCell(x,y);
+                if(c.getBomb() && c.getState() != Cell.State.FLAG){
+                    c.setState(Cell.State.FLAG);
                 }
             }
         }

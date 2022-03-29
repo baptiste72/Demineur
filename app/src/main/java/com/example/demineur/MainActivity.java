@@ -106,8 +106,6 @@ public class MainActivity extends AppCompatActivity {
                     case "addNBomb":
                         int addNBomb = intent.getIntExtra("addNBomb", 0);
                         addNBomb(addNBomb);
-                        // Vérification de la victoire
-                        checkWin();
                     default:
                         break;
                 }
