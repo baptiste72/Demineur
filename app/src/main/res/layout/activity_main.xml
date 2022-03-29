@@ -92,9 +92,13 @@
 
     </LinearLayout>
 
-    <TableLayout
-        android:id="@+id/grid"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent">
+        <TableLayout
+            android:id="@+id/grid"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </ScrollView>
 
 </LinearLayout>

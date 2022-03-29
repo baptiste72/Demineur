@@ -176,13 +176,13 @@ public class Cell extends Fragment {
         // n'est pas FLAG ou QUEST
         if(getState() != State.FLAG && getState() != State.QUEST){
             Handler handler = new Handler();
-            handler.post(() -> {
+            handler.postDelayed(() -> {
                 Intent i = new Intent(MainActivity.BROADCAST);
                 i.putExtra("method", "open");
                 i.putExtra("posX", getPosX());
                 i.putExtra("posY", getPosY());
                 getActivity().sendBroadcast(i);
-            });
+            },10);
         }
     }
 

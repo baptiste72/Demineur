@@ -7,6 +7,7 @@ import java.util.Random;
 public class Grid {
 
     private int nLargeur;
+    private int nHauteur;
     private List<Cell> grille;
 
     /**
@@ -14,12 +15,15 @@ public class Grid {
      * @param largeur Largeur de la grille
      * @param nbBomb Nombre de bombe à placer
      * */
-    public Grid(int largeur, int nbBomb){
+    public Grid(int largeur, int hauteur, int nbBomb){
         nLargeur = largeur;
+        nHauteur = hauteur;
         grille = new ArrayList<>();
         setGrille();
         placeBomb(nbBomb);
     }
+
+    public List<Cell> getGrille(){ return this.grille; }
 
     /**
      * Pouvoir accéder simplement à une cellule
@@ -34,7 +38,7 @@ public class Grid {
      * Ajouter le bon nombre de cellules dans la grille
      * */
     private void setGrille(){
-        for(int x = 0; x < nLargeur; x++){
+        for(int x = 0; x < nHauteur; x++){
             for(int y = 0; y < nLargeur; y++){
                 grille.add(Cell.newInstance(x, y));
             }
@@ -49,7 +53,7 @@ public class Grid {
         int bombToPlace = nBomb;
         while(bombToPlace > 0){
             // Position aléatoire des bombes
-            int rx = new Random().nextInt(nLargeur);
+            int rx = new Random().nextInt(nHauteur);
             int ry = new Random().nextInt(nLargeur);
             Cell c = getCell(rx,ry);
             // Si la case à déjà une bombe passe sans décrémenter
@@ -73,7 +77,7 @@ public class Grid {
         for(int i=x-1; i<=x+1; i++){
             for(int j=y-1; j<=y+1; j++){
                 // Cibler que des cases dans la grille
-                if(i>=0 && i<nLargeur && j>=0 && j<nLargeur) {
+                if(i>=0 && i<nHauteur && j>=0 && j<nLargeur) {
                     getCell(i, j).addNearBomb();
                 }
             }
@@ -98,7 +102,7 @@ public class Grid {
         for(int i=x-1; i<=x+1; i++){
             for(int j=y-1; j<=y+1; j++){
                 // Cibler que des cases dans la grille
-                if(i>=0 && i<nLargeur && j>=0 && j<nLargeur) {
+                if(i>=0 && i<nHauteur && j>=0 && j<nLargeur) {
                     openCell(i,j);
                 }
             }
@@ -110,7 +114,7 @@ public class Grid {
      * */
     public void openBomb(){
         Cell c;
-        for(int x = 0; x < nLargeur; x++){
+        for(int x = 0; x < nHauteur; x++){
             for(int y = 0; y < nLargeur; y++){
                 c = getCell(x,y);
                 if(c.getBomb()){
@@ -123,11 +127,10 @@ public class Grid {
     /**
      * Victoire si :
      *  - toutes les Cell sans bombe DISCOVER
-     * @param nBomb Nombre de bombes restantes
      * */
-    public boolean checkWin(int nBomb){
+    public boolean checkWin(){
         Cell c;
-        for(int x = 0; x < nLargeur; x++){
+        for(int x = 0; x < nHauteur; x++){
             for(int y = 0; y < nLargeur; y++){
                 c = getCell(x,y);
                 if(!c.getBomb() && c.getState() != Cell.State.DISCOVER){
@@ -137,7 +140,7 @@ public class Grid {
             }
         }
         // Si victoire affiche des drapeaux sur toutes les bombes
-        for(int x = 0; x < nLargeur; x++){
+        for(int x = 0; x < nHauteur; x++){
             for(int y = 0; y < nLargeur; y++){
                 c = getCell(x,y);
                 if(c.getBomb() && c.getState() != Cell.State.FLAG){

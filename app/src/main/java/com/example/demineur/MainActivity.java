@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -30,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean gameEnd = false;
     private boolean soundOn = true;
     private int nLevel = 0; // 1 2 3
-    private int nBomb = 0; // 10 25 40
+    private int nBomb = 0; // 10 25 40 99
     private  int nTimer = 0;
     private Grid grille;
     public static final String BROADCAST = "com.cfc.slides.event";
@@ -128,8 +129,6 @@ public class MainActivity extends AppCompatActivity {
     private void nextlevel(){
         if(isNewGame()){
             nLevel = nLevel %3 +1;
-            // Affichage du niveau
-            level.setText("LEVEL "+ nLevel);
             // Nouvelle grille
             newGame();
         }
@@ -158,15 +157,30 @@ public class MainActivity extends AppCompatActivity {
      * Changer la largeur de la grille
      * @param largeur Largeur de la grille à créer
      * */
-    private void gridSide(int largeur){
+    private void gameInit(int largeur, int hauteur, int bomb){
         Toast t = Toast.makeText(this, "Chargement d'une nouvelle grille", Toast.LENGTH_LONG);
         t.show();
+        // Init du Timer
+        nTimer = 0;
+        setNumber(timer, nTimer);
+        // Init des bombes
+        nBomb = bomb;
+        setNumber(bomb_number, nBomb);
+        // Effacer l'ancienne grille
+        if(grille != null){
+            // Lbérer la mémoire
+            for(int nCell = grille.getGrille().size()-1; nCell>=0; nCell--){
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.remove(grille.getGrille().get(nCell));
+                ft.commit();
+            }
+        }
         // Suppression des lignes existantes dans la vue
         tlGrid.removeAllViews();
         // Création d'une nouvelle grille
-        grille = new Grid(largeur, nBomb);
+        grille = new Grid(largeur, hauteur, bomb);
         int idtr = 8190; // id défini (car par défaut tous à -1)
-        for (int x = 0; x < largeur; x++) {
+        for (int x = 0; x < hauteur; x++) {
             // Ajouter une ligne dans la vue
             TableRow tr = new TableRow(this);
             // identifiant différent pour chaque ligne
@@ -190,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
      * Vérification de la victoire
      * */
     private void checkWin(){
-        if(grille.checkWin(nBomb)){
+        if(grille.checkWin()){
             gameWin(true);
         }
     }
@@ -212,14 +226,18 @@ public class MainActivity extends AppCompatActivity {
 
     private void newGame(){
         if(isNewGame()) {
-            // Changer le nombre de bombe
-            nBomb = 10 + ((nLevel - 1) * 15);
-            setNumber(bomb_number, nBomb);
-            // Changer le timer
-            nTimer = 0;
-            setNumber(timer, nTimer);
-            // Changer la taille de grille
-            gridSide(4 + 4 * nLevel); // 8 12 16
+            // Set les paramètres de la grille
+            switch (nLevel){
+                case 1 :
+                    level.setText("FACILE");
+                    gameInit(8,8,10); break;
+                case 2 :
+                    level.setText("MOYEN");
+                    gameInit(16,16,40); break;
+                case 3 :
+                    level.setText("EXTREME");
+                    gameInit(16,32,99); break;
+            }
         }
     }
 
