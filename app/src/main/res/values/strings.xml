@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Demineur</string>
+    <string name="easy">FACILE</string>
+    <string name="medium">MOYEN</string>
+    <string name="hard">EXTREME</string>
 </resources>

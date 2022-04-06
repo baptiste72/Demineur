@@ -1,14 +1,11 @@
 package com.example.demineur;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -17,7 +14,12 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+
+    public static final String BROADCAST = "com.cfc.slides.event";
 
     // Variables xml
     private ImageView replay,trophy,sound;
@@ -32,9 +34,8 @@ public class MainActivity extends AppCompatActivity {
     private boolean soundOn = true;
     private int nLevel = 0; // 1 2 3
     private int nBomb = 0; // 10 25 40 99
-    private  int nTimer = 0;
+    private int nTimer = 0;
     private Grid grille;
-    public static final String BROADCAST = "com.cfc.slides.event";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
         timer = findViewById(R.id.timer);
         tlGrid = findViewById(R.id.grid);
 
+        SaveHighScore.readSP(this);
+
         // Affichage
         setSoundOn(true);
         nextlevel();
@@ -59,16 +62,29 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        replay.setOnClickListener(v -> newGame());
-        level.setOnClickListener(v -> nextlevel());
-        sound.setOnClickListener(v -> setSoundOn());
         registerReceiver(receiver,new IntentFilter(BROADCAST));
+
+        replay.setOnClickListener(this);
+        level.setOnClickListener(this);
+        sound.setOnClickListener(this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         unregisterReceiver(receiver);
+    }
+
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+
+        if (id == R.id.replay)
+            newGame();
+        else if (id == R.id.level)
+            nextlevel();
+        else if (id == R.id.sound)
+            setSoundOn();
     }
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -228,14 +244,14 @@ public class MainActivity extends AppCompatActivity {
         if(isNewGame()) {
             // Set les paramètres de la grille
             switch (nLevel){
-                case 1 :
-                    level.setText("FACILE");
+                case 1:
+                    level.setText(R.string.easy);
                     gameInit(8,8,10); break;
                 case 2 :
-                    level.setText("MOYEN");
+                    level.setText(R.string.medium);
                     gameInit(16,16,40); break;
                 case 3 :
-                    level.setText("EXTREME");
+                    level.setText(R.string.hard);
                     gameInit(16,32,99); break;
             }
         }
@@ -247,7 +263,7 @@ public class MainActivity extends AppCompatActivity {
             gameBegin = false;
             return true;
         } else {
-            Toast.makeText(this,"Veuillez terminer la partie",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"Veuillez terminer la partie", Toast.LENGTH_SHORT).show();
             return false;
         }
     }
@@ -262,5 +278,4 @@ public class MainActivity extends AppCompatActivity {
         // Ajouter start and stop du service
 
     }
-
 }
