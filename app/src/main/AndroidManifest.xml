@@ -12,6 +12,9 @@
         android:theme="@style/Theme.Demineur">
 
         <activity
+            android:name=".controller.GameActivity"
+            android:exported="false" />
+        <activity
             android:name=".controller.HighScoreActivity"
             android:exported="false" />
         <activity
