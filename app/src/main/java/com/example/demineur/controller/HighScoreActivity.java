@@ -2,6 +2,10 @@ package com.example.demineur.controller;
 
 import android.os.Bundle;
 
+import com.example.demineur.model.Game;
+import com.example.demineur.R;
+import com.example.demineur.model.SaveHighScore;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 

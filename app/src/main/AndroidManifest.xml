@@ -23,8 +23,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <service
-            android:name=".ServiceMusique"
+            android:name=".model.ServiceMusique"
             android:enabled="true"
             android:exported="true" />
     </application>

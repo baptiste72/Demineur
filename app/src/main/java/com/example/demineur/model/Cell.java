@@ -9,6 +9,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.demineur.R;
+import com.example.demineur.controller.MainActivity;
+
 import androidx.fragment.app.Fragment;
 
 import com.example.demineur.controller.MainActivity;
