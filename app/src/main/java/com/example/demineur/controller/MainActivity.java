@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TableLayout;
@@ -20,6 +21,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.example.demineur.R;
 import com.example.demineur.model.Cell;
 import com.example.demineur.model.Grid;
+import com.example.demineur.model.ServiceMusique;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -29,7 +31,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView replay,trophy,sound;
     private EditText name;
     private Button level;
-    private TextView bomb_number,timer;
+    private TextView bomb_number, timer;
     private TableLayout tlGrid;
 
     // Variables
@@ -40,6 +42,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int nBomb = 0; // 10 25 40 99
     private int nTimer = 0;
     private Grid grille;
+
+    private boolean running;
+
+    //private ServiceMusique mServiceMusique;
+    //Intent n'est pas visible depuis l'exterieur
+    private Intent intentService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,12 +61,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         name = findViewById(R.id.name);
         level = findViewById(R.id.level);
         bomb_number = findViewById(R.id.bomb_number);
-        timer = findViewById(R.id.timer);
         tlGrid = findViewById(R.id.grid);
 
         // Affichage
         setSoundOn(true);
         nextlevel();
+        //Appel de la fonction musique au demarrage
+        startMusicService("game");
+        //Debut du chronometre
+        timer = findViewById(R.id.timer);
+    }
+
+    /**
+     * Lancement du service pour la musique de fond
+     */
+    protected void startMusicService(String morceau) {
+        Intent intentMusic = new Intent(this, ServiceMusique.class);
+        intentMusic.putExtra("morceau", morceau);
+        startService(intentMusic);
+    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        startService(intentService);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        stopService(intentService);
     }
 
     @Override
@@ -69,6 +100,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         replay.setOnClickListener(this);
         level.setOnClickListener(this);
         sound.setOnClickListener(this);
+
+        startService(intentService);
+        stopService(new Intent(this, ServiceMusique.class));
     }
 
     @Override
@@ -278,6 +312,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void setSoundOn(boolean bool){
         sound.setImageResource(soundOn ? R.drawable.sound : R.drawable.nosound);
         // Ajouter start and stop du service
+    }
 
+    public void startChronometer(View v) {
+        if(!running){
+            //timer.onStart();
+            running = true;
+        }
+    }
+    public void pauseChronometer(View v) {
+
+    }
+    public void resetChronometer(View v) {
     }
 }
