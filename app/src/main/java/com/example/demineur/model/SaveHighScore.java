@@ -1,10 +1,8 @@
-package com.example.demineur;
+package com.example.demineur.model;
 
 import static android.content.Context.MODE_PRIVATE;
 
-import android.content.Context;
 import android.content.SharedPreferences;
-
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -12,51 +10,66 @@ import com.google.gson.reflect.TypeToken;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Classe permettant de lire et d'enregistrer les résultats des parties dans les SharedPreferences
+ * Celle-ci doit être accessible et partagée par plusieurs classes de l'application
+ * Il est donc intéressant qu'elle prenne la forme d'un singleton
+ */
+
 public class SaveHighScore {
 
-    private static final String NAME_KEY = "MY_PREFS_NAME";
+    private static final String SP_KEY = "SAVE_HIGH_SCORE";
     private static final String GAME_KEY = "GAME_KEY";
     private static final Gson GSON = new Gson();
 
-    private static SharedPreferences.Editor editor;
+    private static SaveHighScore INSTANCE;
 
-    private static List<Game> games = new ArrayList<>();
+    private final SharedPreferences PREFERENCES;
 
-    public static List<Game> getGames() {
+    private List<Game> games = new ArrayList<>();
+
+    private SaveHighScore() {
+        PREFERENCES = ExampleApplication.getContext().getSharedPreferences(SP_KEY, MODE_PRIVATE);
+    }
+
+    public static SaveHighScore getInstance() {
+        if (INSTANCE == null)
+            INSTANCE = new SaveHighScore();
+
+        return INSTANCE;
+    }
+
+    public List<Game> getGames() {
         return games;
     }
 
-    private static void setGames(List<Game> games) {
-        SaveHighScore.games = games;
+    private void setGames(List<Game> games) {
+        this.games = games;
     }
 
     /**
      * Lit les SharedPreferences
-     * @param context Contexte depuis lequel la méthode est exécutée
      */
-    public static void readSP(Context context) {
-        final SharedPreferences PREFS = context.getSharedPreferences(NAME_KEY, MODE_PRIVATE);
-        editor = PREFS.edit();
+    public void readSP() {
+        final String READ_SP = PREFERENCES.getString(GAME_KEY, null);
 
-        final String READ_SP = PREFS.getString(GAME_KEY, "");
-
-        if (!READ_SP.isEmpty())
+        if (READ_SP != null)
             // Stocke la liste des parties dans la liste games
             setGames(GSON.fromJson(READ_SP, new TypeToken<ArrayList<Game>>(){}.getType()));
     }
 
     /**
      * Écrit dans les SharedPreferences
-     * @param context Contexte depuis lequel la méthode est exécutée
      * @param game Partie à ajouter aux SharedPreferences
      */
-    public static void writeSP(Context context, Game game) {
+    public void writeSP(Game game) {
         final String NAME = game.getPlayer().getName();
         final int SCORE = game.getScore();
         final Game.Level LEVEL = game.getLevel();
         boolean playerAlreadyExists = false;
 
-        readSP(context);
+        // On récupère la liste des parties enregistrée dans les SharedPreferences
+        readSP();
 
         // On parcourt la liste des parties enregistrées
         for (Game currentGame : getGames()) {
@@ -75,7 +88,6 @@ public class SaveHighScore {
         if (!playerAlreadyExists)
             getGames().add(game);
 
-        editor.putString(GAME_KEY, GSON.toJson(getGames()));
-        editor.apply();
+        PREFERENCES.edit().putString(GAME_KEY, GSON.toJson(getGames())).apply();
     }
 }

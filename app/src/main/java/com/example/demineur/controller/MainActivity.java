@@ -1,4 +1,4 @@
-package com.example.demineur;
+package com.example.demineur.controller;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -16,6 +16,10 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
+
+import com.example.demineur.R;
+import com.example.demineur.model.Cell;
+import com.example.demineur.model.Grid;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -51,8 +55,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bomb_number = findViewById(R.id.bomb_number);
         timer = findViewById(R.id.timer);
         tlGrid = findViewById(R.id.grid);
-
-        SaveHighScore.readSP(this);
 
         // Affichage
         setSoundOn(true);

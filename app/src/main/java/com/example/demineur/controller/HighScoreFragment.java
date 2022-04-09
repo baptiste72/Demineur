@@ -1,4 +1,4 @@
-package com.example.demineur;
+package com.example.demineur.controller;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
+
+import com.example.demineur.R;
 
 /**
  * Classe représentant les données reçues par le fragment HighScoreFragment
@@ -18,8 +20,6 @@ public class HighScoreFragment extends Fragment {
     public static final String NAME_KEY = "NAME";
     public static final String SCORE_KEY = "SCORE";
 
-    private TextView f_name;
-    private TextView f_score;
     private String name;
     private int score;
 
@@ -54,9 +54,9 @@ public class HighScoreFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_high_score, container, false);
-        f_name = view.findViewById(R.id.f_name);
+        TextView f_name = view.findViewById(R.id.f_name);
         f_name.setText(name);
-        f_score = view.findViewById(R.id.f_score);
+        TextView f_score = view.findViewById(R.id.f_score);
         f_score.setText(String.valueOf(score));
         return view;
     }

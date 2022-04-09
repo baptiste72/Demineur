@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:stretchColumns="*"
-    tools:context=".HighScoreFragment">
+    tools:context=".controller.HighScoreFragment">
 
     <TableRow
         android:layout_width="match_parent"

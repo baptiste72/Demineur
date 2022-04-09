@@ -1,9 +1,13 @@
-package com.example.demineur;
+package com.example.demineur.controller;
 
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
+
+import com.example.demineur.R;
+import com.example.demineur.model.Game;
+import com.example.demineur.model.SaveHighScore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,9 +25,9 @@ public class HighScoreActivity extends AppCompatActivity {
         super.onResume();
 
         // Récupère le nom des joueurs avec les scores associés en fonction du niveau
-        SaveHighScore.readSP(this);
+        SaveHighScore.getInstance().readSP();
         // Affiche les high scores dans des fragments
-        printFragments(SaveHighScore.getGames());
+        printFragments(SaveHighScore.getInstance().getGames());
     }
 
     private void printFragments(List<Game> games) {

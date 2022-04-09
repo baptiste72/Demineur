@@ -1,4 +1,4 @@
-package com.example.demineur;
+package com.example.demineur.model;
 
 /**
  * Classe représentant un joueur

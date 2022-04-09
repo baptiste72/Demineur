@@ -1,4 +1,4 @@
-package com.example.demineur;
+package com.example.demineur.model;
 
 import java.util.ArrayList;
 import java.util.List;
