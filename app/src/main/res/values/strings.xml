@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">Demineur</string>
+    <string name="mine">mine</string>
+    <string name="enter_your_name">Entrer votre nom</string>
+    <string name="new_game">Nouvelle partie</string>
     <string name="easy">FACILE</string>
     <string name="medium">MOYEN</string>
     <string name="hard">EXTREME</string>

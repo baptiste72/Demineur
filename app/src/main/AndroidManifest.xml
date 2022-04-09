@@ -5,20 +5,23 @@
     <application
         android:name=".model.ExampleApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/icon"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/icon"
         android:supportsRtl="true"
         android:theme="@style/Theme.Demineur">
 
         <activity
             android:name=".controller.GameActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".controller.HighScoreActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".controller.MainActivity"
+            android:screenOrientation="portrait"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
