@@ -1,11 +1,13 @@
 package com.example.demineur.model;
 
+import java.io.Serializable;
+
 /**
  * Classe représentant un joueur
  * Les joueurs possèdent un nom
  */
 
-public class Player {
+public class Player implements Serializable {
 
     private String name;
 

@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
-import com.example.demineur.controller.MainActivity;
+import com.example.demineur.controller.GameActivity;
 import com.example.demineur.R;
 
 /**
@@ -173,7 +173,7 @@ public class Cell extends Fragment {
         if(getState() != State.FLAG && getState() != State.QUEST){
             Handler handler = new Handler();
             handler.postDelayed(() -> {
-                Intent i = new Intent(MainActivity.BROADCAST);
+                Intent i = new Intent(GameActivity.BROADCAST);
                 i.putExtra("method", "open");
                 i.putExtra("posX", getPosX());
                 i.putExtra("posY", getPosY());
@@ -185,7 +185,7 @@ public class Cell extends Fragment {
     private boolean sendNextState(){
         Handler handler = new Handler();
         handler.post(() -> {
-            Intent i = new Intent(MainActivity.BROADCAST);
+            Intent i = new Intent(GameActivity.BROADCAST);
             i.putExtra("method","nextState");
             i.putExtra("posX",getPosX());
             i.putExtra("posY",getPosY());
@@ -256,7 +256,7 @@ public class Cell extends Fragment {
     private void addNBomb(int nBomb){
         Handler handler = new Handler();
         handler.post(() -> {
-            Intent i = new Intent(MainActivity.BROADCAST);
+            Intent i = new Intent(GameActivity.BROADCAST);
             i.putExtra("method","addNBomb");
             i.putExtra("addNBomb",nBomb);
             getActivity().sendBroadcast(i);

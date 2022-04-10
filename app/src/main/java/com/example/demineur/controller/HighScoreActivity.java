@@ -1,6 +1,8 @@
 package com.example.demineur.controller;
 
 import android.os.Bundle;
+import android.view.Window;
+import android.view.WindowManager;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
@@ -17,6 +19,11 @@ public class HighScoreActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        /* Ces deux lignes permettent de rendre la status bar transparente
+        Ceci garantit que notre fond d'écran s'adapte à tout l'écran */
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION, WindowManager.LayoutParams.TYPE_STATUS_BAR);
+
         setContentView(R.layout.activity_high_score);
     }
 

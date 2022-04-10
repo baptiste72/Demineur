@@ -1,12 +1,14 @@
 package com.example.demineur.model;
 
+import java.io.Serializable;
+
 /**
  * Classe représentant les paramètres d'une partie
  * Chaque partie possède un joueur
  * Les joueurs obtiennent un score associé à un niveau
  */
 
-public class Game {
+public class Game implements Serializable {
 
     // Le niveau d'une partie peut prendre trois valeurs
     public enum Level {
@@ -20,12 +22,10 @@ public class Game {
     /**
      * Constructeur de la classe Game
      * @param player Joueur de la partie
-     * @param score Score de la partie
      * @param level Difficulté de la partie
      */
-    public Game(Player player, int score, Level level) {
+    public Game(Player player, Level level) {
         setPlayer(player);
-        setScore(score);
         setLevel(level);
     }
 
