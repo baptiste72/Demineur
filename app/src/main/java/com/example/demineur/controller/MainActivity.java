@@ -22,12 +22,7 @@ import com.example.demineur.model.ServiceMusique;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.example.demineur.R;
-import com.example.demineur.model.Cell;
-import com.example.demineur.model.Grid;
-import com.example.demineur.model.ServiceMusique;
-
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity {
 
     public static final String BROADCAST = "com.cfc.slides.event";
 
@@ -49,9 +44,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private boolean running;
 
-    //private ServiceMusique mServiceMusique;
-    //Intent n'est pas visible depuis l'exterieur
-    private Intent intentService;
+    private Intent intentMusic;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,34 +59,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         level = findViewById(R.id.level);
         bomb_number = findViewById(R.id.bomb_number);
         tlGrid = findViewById(R.id.grid);
-
-        // Affichage
-        setSoundOn(true);
-        nextlevel();
-        //Appel de la fonction musique au demarrage
-        startMusicService("game");
-        //Debut du chronometre
         timer = findViewById(R.id.timer);
-    }
 
-    /**
-     * Lancement du service pour la musique de fond
-     */
-    protected void startMusicService(String morceau) {
-        Intent intentMusic = new Intent(this, ServiceMusique.class);
-        intentMusic.putExtra("morceau", morceau);
-        startService(intentMusic);
-    }
-    @Override
-    protected void onStart() {
-        super.onStart();
-        startService(intentService);
+        // Lancement de la musique
+        setSound(true);
+        // Affichage de la grille
+        nextlevel();
+        //Debut du chronometre
+
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        stopService(intentService);
+        stopService(intentMusic);
+        intentMusic = null;
     }
 
     @Override
@@ -101,30 +81,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onResume();
         registerReceiver(receiver,new IntentFilter(BROADCAST));
 
-        replay.setOnClickListener(this);
-        level.setOnClickListener(this);
-        sound.setOnClickListener(this);
+        replay.setOnClickListener(v -> newGame());
+        level.setOnClickListener(v -> nextlevel());
+        sound.setOnClickListener(v -> setSound());
 
-        startService(intentService);
-        stopService(new Intent(this, ServiceMusique.class));
+        setSound(soundOn);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         unregisterReceiver(receiver);
-    }
-
-    @Override
-    public void onClick(View v) {
-        int id = v.getId();
-
-        if (id == R.id.replay)
-            newGame();
-        else if (id == R.id.level)
-            nextlevel();
-        else if (id == R.id.sound)
-            setSoundOn();
     }
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -273,14 +240,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Fin de la game
         gameEnd = true;
         if(win){
-            // Ajouter la victoire
+            // Victoire
             Toast.makeText(this,"Victoire !",Toast.LENGTH_SHORT).show();
+            setSound(soundOn,ServiceMusique.MENU,false);
         } else {
             // Défaite
+            setSound(soundOn,ServiceMusique.SCORE,false);
         }
     }
 
     private void newGame(){
+        setSound(soundOn);
         if(isNewGame()) {
             // Set les paramètres de la grille
             switch (nLevel){
@@ -308,14 +278,47 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void setSoundOn(){
-        soundOn = !soundOn;
-        setSoundOn(soundOn);
+    /**
+     * Lancement du service pour la musique de fond
+     */
+    private void setSound(boolean bool,String music_name, boolean loop){
+        // Start and stop du service
+        if(bool){
+            if(intentMusic != null){
+                if(music_name.equals(ServiceMusique.GAME) && intentMusic.getStringExtra("music_name").equals(ServiceMusique.GAME)){
+                    // si musique en cours est le theme principal alors ne rien faire
+                } else {
+                    stopService(intentMusic);
+                    intentMusic = null;
+                }
+            }
+            if(intentMusic == null){
+                intentMusic = new Intent(this, ServiceMusique.class);
+                intentMusic.putExtra("music_name", music_name);
+                intentMusic.putExtra("music_loop", loop);
+                startService(intentMusic);
+                soundOn = true;
+            }
+        } else {
+            if(intentMusic != null){
+                stopService(intentMusic);
+                intentMusic = null;
+                soundOn = false;
+            }
+        }
+        sound.setImageResource(soundOn ? R.drawable.sound : R.drawable.nosound);
     }
 
-    private void setSoundOn(boolean bool){
-        sound.setImageResource(soundOn ? R.drawable.sound : R.drawable.nosound);
-        // Ajouter start and stop du service
+    private void setSound(boolean music_start){
+        if(music_start){
+            setSound(true,ServiceMusique.GAME,true);
+        } else {
+            setSound(false,"",false);
+        }
+    }
+
+    private void setSound(){
+        setSound(!soundOn);
     }
 
     public void startChronometer(View v) {

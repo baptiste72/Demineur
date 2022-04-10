@@ -16,9 +16,9 @@ public class ServiceMusique extends Service {
     public ServiceMusique() {
     }
 
-    private static String GAME = "game";
-    private static String MENU = "menu";
-    private static String SCORE = "score";
+    public static String GAME = "game";
+    public static String MENU = "menu";
+    public static String SCORE = "score";
 
     private MediaPlayer player;
     private Handler handler;
@@ -50,7 +50,7 @@ public class ServiceMusique extends Service {
 
         if(player == null){
             //On récupère le nom du morceau à jouer dans l'intent
-            String morceau = intent.getStringExtra("morceau");
+            String morceau = intent.getStringExtra("music_name");
             if (morceau.equals(MENU)) {
                 player = MediaPlayer.create(this.getBaseContext(), R.raw.menu);
             } else if (morceau.equals(GAME)) {
@@ -62,7 +62,7 @@ public class ServiceMusique extends Service {
             }
 
             //Quand la musique est fini, la relance automatiquement
-            player.setLooping(true);
+            player.setLooping(intent.getBooleanExtra("music_loop",false));
 
             //Démarre la musique
             player.start();
