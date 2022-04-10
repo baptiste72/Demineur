@@ -247,13 +247,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             // Set les paramètres de la grille
             switch (nLevel){
                 case 1:
-                    level.setText(R.string.easy);
+
                     gameInit(8,8,10); break;
                 case 2 :
-                    level.setText(R.string.medium);
+
                     gameInit(16,16,40); break;
                 case 3 :
-                    level.setText(R.string.hard);
+
                     gameInit(16,32,99); break;
             }
         }
