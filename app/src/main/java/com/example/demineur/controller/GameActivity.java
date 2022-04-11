@@ -10,9 +10,6 @@ import android.os.Handler;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -27,7 +24,6 @@ import com.example.demineur.model.Cell;
 import com.example.demineur.model.Game;
 import com.example.demineur.model.Grid;
 import com.example.demineur.model.SaveHighScore;
-import com.example.demineur.model.ServiceMusique;
 
 /**
  * Activité de jeu
@@ -48,7 +44,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private int nBomb = 0; // 10 25 40 99
     private int nTimer = 0;
     private Grid grille;
-    private int counter = 0;
 
     //private ServiceMusique mServiceMusique;
     //Intent n'est pas visible depuis l'exterieur
@@ -96,8 +91,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         handler.post(new Runnable() {
             @Override
             public void run() {
-                counter++;
-                timer.setText(String.valueOf(counter));
+                nTimer++;
+                timer.setText(String.valueOf(nTimer));
                 // On incrémente toutes les secondes
                 handler.postDelayed(this, 1000);
             }
