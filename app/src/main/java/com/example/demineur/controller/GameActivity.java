@@ -43,6 +43,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private int nLevel = 0; // 1 2 3
     private int nBomb = 0; // 10 25 40 99
     private int nTimer = 0;
+    private boolean pauseTimer = false;
     private Grid grille;
 
     //private ServiceMusique mServiceMusique;
@@ -86,13 +87,15 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 //        startService(intentMusic);
 //    }
 
-    private void timerGame(){
+    private void startTimer(){
         Handler handler = new Handler();
         handler.post(new Runnable() {
             @Override
             public void run() {
-                nTimer++;
-                timer.setText(String.valueOf(nTimer));
+                if(!pauseTimer){
+                    nTimer++;
+                    setNumber(timer,nTimer);
+                }
                 // On incrémente toutes les secondes
                 handler.postDelayed(this, 1000);
             }
@@ -114,13 +117,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         game = getIntentParams();
         newGame(game);
         setSoundOn(true);
-        timerGame();
+        pauseTimer = false;
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         unregisterReceiver(receiver);
+        pauseTimer = true;
     }
 
     @Override
@@ -167,7 +171,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                             //  Dire que la game est perdu
                             gameWin(false);
                         } else {
-                            gameBegin = true;
+                            if(!gameBegin){
+                                startTimer();
+                                gameBegin = true;
+                            }
                             // S'il n'y a pas de bombes adjacentes
                             if(c.getNearBomb() == 0){
                                 // Ouvre les cases adjacentes
