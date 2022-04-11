@@ -33,7 +33,7 @@
         android:ems="10"
         android:background="@drawable/input_background"
         android:autofillHints="textPersonName"
-        android:inputType="textPersonName"
+        android:inputType="textCapWords"
         android:digits="@string/allowed_chars"
         android:hint="@string/enter_your_name"
         android:textColorHint="@color/white"

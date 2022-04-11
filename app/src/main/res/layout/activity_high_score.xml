@@ -6,5 +6,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@drawable/gradient_background"
-    tools:context=".controller.HighScoreActivity">
+    tools:context=".controller.HighScoreActivity"
+    android:padding="20dp">
 </LinearLayout>

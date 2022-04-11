@@ -92,12 +92,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         handler.post(new Runnable() {
             @Override
             public void run() {
-                if(!pauseTimer){
+                if(!pauseTimer && !gameEnd){
                     nTimer++;
                     setNumber(timer,nTimer);
                 }
-                // On incrémente toutes les secondes
-                handler.postDelayed(this, 1000);
+                if(!gameEnd){
+                    // On incrémente toutes les secondes
+                    handler.postDelayed(this, 1000);
+                }
             }
         });
     }
@@ -132,8 +134,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         int id = v.getId();
 
         if (id == R.id.replay) {
-            Intent mainActivity = new Intent(this, MainActivity.class);
-            startActivity(mainActivity);
+
+            newGame(game);
         }
 
         else if (id == R.id.trophy) {
